@@ -198,5 +198,46 @@ function prepareTemplatedMachineData(simplifiedDataToBeProcessed)
 		}
 		templateData[title] = preparedData;
 	}
+    
+    ikkoTemplate = JSON.stringify(templateData);
 	return templateData;
 }
+
+
+var ikkoTemplate = "";
+
+//Collect all data I want.
+//machines and all recipes and ingredients
+//elements and all their colors and machines they are stored in.
+function ikkofyJSON() 
+{
+    	var templateData = JSON.parse(ikkoTemplate)
+		var machina = {machines:{},recipes:{},elements:{},ingredients:{inputs:{},outputs:{}}};
+		for (const mach in templateData)
+		{
+			
+			delete templateData[mach].recipes;
+			delete templateData[mach].displayStep;
+            var processRec = function (recs) 
+                {
+                	for (const rec in recs)
+					{
+						delete recs[rec].enabled;
+						delete recs[rec].unlocked;
+						machina.recipes[rec] = recs[rec];
+					}
+                } 
+			processRec(templateData[mach].baseRecipes);
+			processRec(templateData[mach].hiddenRecipes);
+            
+			machina.machines[mach] = templateData[mach];
+		}
+		for (i=0;i<initialData.elements.length;i++)
+			{
+				machina.elements[initialData.elements[i]] = {
+					   colors:elementalColors[initialData.elements[i]],
+					   machine:machineDisplayElements[initialData.elements[i]],
+					   }
+			}
+		return JSON.stringify(machina)
+	}
